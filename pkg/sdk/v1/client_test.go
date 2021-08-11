@@ -63,7 +63,7 @@ func (ts *TestSuite) SetupTest() {
 	ts.NoError(err)
 }
 
-func (ts *TestSuite) TestOmniclient_New() {
+func (ts *TestSuite) TestNetcpclient_New() {
 	type args struct {
 		url          string
 		refreshToken string
@@ -103,7 +103,7 @@ func (ts *TestSuite) TestOmniclient_New() {
 	}
 }
 
-func (ts *TestSuite) TestOmniclient_Authenticate() {
+func (ts *TestSuite) TestNetcpclient_Authenticate() {
 	type args struct {
 		token netcp.OauthToken
 	}

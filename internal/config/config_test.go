@@ -50,7 +50,7 @@ func writeMockConfigFile(t *testing.T) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		os.Mkdir(path, 0700)
 	}
-	f, err := os.Create(path + "/omnitestapp.testenv.yaml")
+	f, err := os.Create(path + "/netcp.test.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,7 +69,7 @@ func TestConfigTestSuite(t *testing.T) {
 
 func (ts *TestSuite) SetupTest() {
 	var err error
-	ts.cfg, err = New("testapp", "testenv", cfgDefaults)
+	ts.cfg, err = New("app", "test", cfgDefaults)
 	ts.NoError(err)
 
 	err = ts.cfg.Load()

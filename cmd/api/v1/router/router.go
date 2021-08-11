@@ -3,6 +3,8 @@ package router
 import (
 	"fmt"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
+
 	//"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"time"
@@ -49,13 +51,13 @@ func Server(cfg *config.Config) {
 	/*
 	 * Routes
 	 */
-	//r.Use(static.Serve("/ui/", static.LocalFile("dist/ui/", true)))
-	//r.Use(static.Serve("/swagger/", static.LocalFile("cmd/api/docs", false)))
+	r.Use(static.Serve("/ui/", static.LocalFile("ui/dist", true)))
+	r.Use(static.Serve("/swagger/", static.LocalFile("cmd/api/docs", false)))
 
-	//// Redirect / to /ui/
-	//r.GET("/", func(c *gin.Context) {
-	//	c.Redirect(301, "/ui/")
-	//})
+	// Redirect / to /ui/
+	r.GET("/", func(c *gin.Context) {
+		c.Redirect(301, "/ui/")
+	})
 
 	// Server - Authenticated
 	v1Route := r.Group("/api/v1")

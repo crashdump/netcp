@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagUrl, "url", "http://127.0.0.1:3000", "URL of Omniscient API")
+	flag.StringVar(&flagUrl, "url", "http://127.0.0.1:3000", "URL of Netcp API")
 }
 
 func main() {
