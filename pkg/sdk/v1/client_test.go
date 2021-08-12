@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/crashdump/netcp/cmd/api/v1/router"
+	"github.com/crashdump/netcp/cmd/api/v1/route"
 	apicfg "github.com/crashdump/netcp/internal/config"
 	netcp "github.com/crashdump/netcp/pkg/sdk/v1"
 )
@@ -41,7 +41,7 @@ func TestSDKTestSuite(t *testing.T) {
 		t.Error(err)
 	}
 	cfg.Load()
-	go router.Server(cfg)
+	go route.Server(cfg)
 
 	err = helpers.WaitForAPI(apiUrl + "status")
 	if err != nil {

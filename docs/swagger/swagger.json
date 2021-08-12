@@ -1,0 +1,413 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/auth": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "auth"
+        ],
+        "summary": "Returns list of all auth methods.",
+        "operationId": "getAuths",
+        "responses": {
+          "200": {
+            "description": "auth list response",
+            "schema": {
+              "$ref": "#/definitions/AuthListResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      }
+    },
+    "/auth/servers": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "summary": "Returns list of all auth methods.",
+        "operationId": "getAuths",
+        "responses": {
+          "200": {
+            "description": "auth list response",
+            "schema": {
+              "$ref": "#/definitions/AuthListResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      }
+    },
+    "/blob": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "blob"
+        ],
+        "summary": "Returns list of all people.",
+        "operationId": "getBlobs",
+        "responses": {
+          "200": {
+            "description": "blob list response",
+            "schema": {
+              "$ref": "#/definitions/BlobListResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "blob"
+        ],
+        "summary": "Insert given new blob details in people.",
+        "operationId": "addBlob",
+        "parameters": [
+          {
+            "description": "Blob object that needs to be added to the people",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Blob"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "blob add response",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      }
+    },
+    "/blob/{id}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "blob"
+        ],
+        "summary": "Returns blob details of given blob id.",
+        "operationId": "getBlob",
+        "parameters": [
+          {
+            "description": "Blob id which is require to fetch blob details.",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "blob get response",
+            "schema": {
+              "$ref": "#/definitions/BlobResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "blob"
+        ],
+        "summary": "Delete blob details of given blob id.",
+        "operationId": "deleteBlob",
+        "parameters": [
+          {
+            "description": "Blob id which is require to delete blob details.",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "blob delete response",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      }
+    },
+    "/user": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Returns list of all people.",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "user list response",
+            "schema": {
+              "$ref": "#/definitions/UserListResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Insert given new user details in people.",
+        "operationId": "addUser",
+        "parameters": [
+          {
+            "description": "User object that needs to be added to the people",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user add response",
+            "schema": {
+              "type": "object",
+              "required": [
+                "id"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Returns user details of given user id.",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "description": "User id which is require to fetch user details.",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user get response",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      },
+      "put": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Update given user details in people.",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "description": "User id which is require to fetch user details.",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "User object that needs to be update in the people",
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user update response",
+            "schema": {
+              "$ref": "#/definitions/UserResponse"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      },
+      "delete": {
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete user details of given user id.",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "description": "User id which is require to delete user details.",
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "user delete response",
+            "schema": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "description": "General error",
+            "schema": {
+              "$ref": "#/definitions/GeneralError"
+            }
+          }
+        }
+      }
+    }
+  }
+}

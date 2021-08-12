@@ -1,11 +1,11 @@
 package controller
 
 import (
+	"github.com/crashdump/netcp/internal/model"
+	"github.com/crashdump/netcp/internal/repository"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"github.com/crashdump/netcp/internal/model"
-	"github.com/crashdump/netcp/internal/repository"
 	"time"
 )
 
@@ -17,10 +17,6 @@ type BlobController struct {
 var (
 	MsgSucessBlobCreated = "blob created successfully"
 	MsgSucessBlobDeleted = "blob deleted successfully"
-	//MsgErrorInvalidID         = "invalid blob id"
-	//MsgErrorNotFound          = "blob not found"
-	//MsgErrorFieldMissingName  = "field name is mandatory"
-	MsgErrorFieldMissingOS = "field operating_system is mandatory"
 )
 
 // GET /blobs
@@ -69,34 +65,9 @@ func (v BlobController) Post(c *gin.Context) {
 	c.JSON(http.StatusOK, blob)
 }
 
-// PUT /blob
-func (v BlobController) Put(c *gin.Context) {
-	//var blob models.Blob
-	//c.Bind(&blob)
-	//
-	//if blob.Name == "" {
-	//	c.JSON(http.StatusUnprocessableEntity, gin.H{"status": MsgErrorFieldMissingName})
-	//}
-	//
-	//if blob.Email == "" {
-	//	c.JSON(http.StatusUnprocessableEntity, gin.H{"status": MsgErrorFieldMissingEmail})
-	//}
-	//
-	//err := models.GetDB().Create(&blob).Error // INSERT INTO "blobs" (name) VALUES (blob.Name);
-	//
-	//switch err {
-	//case gorm.ErrRecordNotFound:
-	//	c.JSON(http.StatusNotFound, gin.H{"error": MsgErrorNotFound})
-	//case nil:
-	//	c.JSON(http.StatusOK, gin.H{"success": blob})
-	//default:
-	//	c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	//}
-}
-
 // DELETE /blob/:id
 func (v BlobController) Delete(c *gin.Context) {
-	//// Get id blob
+	//// Firebase id blob
 	//id := c.Params.ByName("id")
 	//
 	//var blob models.Blob

@@ -8,11 +8,11 @@ import (
 type User struct {
 	Model
 
-	Auth0ID  string `json:"-" gorm:"auth0_id"`
-	APIToken string `json:"-" gorm:"api_token"`
+	Auth0ID  string `json:"-" firestore:"auth0_id"`
+	APIToken string `json:"-" firestore:"api_token"`
 
-	Name  string `json:"name" gorm:"name"`
-	Email string `json:"email" gorm:"email"`
+	Name  string `json:"name" firestore:"name"`
+	Email string `json:"email" firestore:"email"`
 }
 
 func (u User) String() string {

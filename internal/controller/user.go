@@ -103,7 +103,7 @@ func (v UserController) Put(c *gin.Context) {
 
 // DELETE /user/:id
 func (v UserController) Delete(c *gin.Context) {
-	//// Get id user
+	//// Firebase id user
 	//id := c.Params.ByName("id")
 	//
 	//var user models.User

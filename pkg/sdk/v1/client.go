@@ -33,7 +33,6 @@ func New(url string) (*Client, error) {
 		return &Client{}, err
 	}
 
-
 	return &client, nil
 }
 
@@ -47,7 +46,6 @@ func (n *Client) IsAuthenticated() bool {
 	// TODO: Actually check the token's validity
 	return n.auth.ExpiresIn > 1
 }
-
 
 func (n *Client) GetOauthRefreshToken() string {
 	return n.auth.RefreshToken

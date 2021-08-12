@@ -1,30 +1,48 @@
 package repository
 
 import (
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-
-	"github.com/crashdump/netcp/internal/model"
+	"cloud.google.com/go/firestore"
+	"context"
+	firebase "firebase.google.com/go/v4"
+	"firebase.google.com/go/v4/auth"
+	"firebase.google.com/go/v4/storage"
+	"google.golang.org/appengine/log"
 )
 
-var gdb *gorm.DB
+type Fclient struct {
+	auth *auth.Client
+	firestore *firestore.Client
+	storage *storage.Client
+}
 
-// Open establishes connection to database and saves its handler into gdb *gorm.DB
-func OpenGorm(connection string) {
+var fclient Fclient
+
+// Open establishes connection to firebase and saves its handler into fclient *firebase.App
+func Open(fa *firebase.App) error {
 	var err error
-	gdb, err = gorm.Open(postgres.Open(connection), &gorm.Config{})
+	ctx := context.Background()
+
+	fclient.auth, err = fa.Auth(ctx)
 	if err != nil {
-		panic(err)
+		log.Criticalf(ctx, "error initialising auth storage: %v", err)
+		return err
 	}
+
+	fclient.firestore, err = fa.Firestore(ctx)
+	if err != nil {
+		log.Criticalf(ctx, "error initialising firestore storage: %v", err)
+		return err
+	}
+
+	fclient.storage, err = fa.Storage(ctx)
+	if err != nil {
+		log.Criticalf(ctx, "error initialising firebase storage: %v", err)
+		return err
+	}
+
+	return nil
 }
 
-func GetGorm() *gorm.DB {
-	return gdb
-}
-
-// AutoMigrate runs gorm auto migration
-func AutoMigrate() {
-	gdb.AutoMigrate(
-		&model.User{},
-	)
+func Firebase() Fclient {
+	return fclient
 }

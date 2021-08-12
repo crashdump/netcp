@@ -1,0 +1,55 @@
+name: build_test
+
+on: [push, pull_request]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-hub/gcloud@master
+        env:
+          PROJECT_ID: cloudcopy-it
+          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        with:
+          args: info
+
+      #
+      # Setup Golang
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16.3'
+
+      #
+      # Setup Node
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+          check-latest: true
+
+      #
+      # Cache
+      - uses: actions/cache@v2
+        id: yarn-cache
+        with:
+          path: |
+            ./ui/node_modules
+            ~/.config/yarn/global
+            ~/.yarn
+            ~/go/pkg/mod
+          key: ${{ runner.os }}-omnibuild-${{ hashFiles('./go.sum') }}-${{ hashFiles('./ui/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-omnibuild--
+
+
+      #
+      # Build and test
+      - run: |
+          yarn global add @vue/cli @vue/cli-service @vue/cli-service-global @vue/cli-plugin-unit-jest vue-eslint-parser jest
+          yarn install
+
+      - run: make build
+
+      - run: make test

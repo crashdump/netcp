@@ -4,7 +4,7 @@ UNAME := $(shell uname -s)
 
 ifeq ($(UNAME), Darwin)
 	# TODO: Ensure the below automatically select the right identity so it's not tied to my machine.
-	CMD_SIGN := codesign --verify --force -vv -s "Apple Development: ap@cdfr.net (SQ9LA8W8BB)" dist/app/netcpapp
+	CMD_SIGN := codesign --verify --force -vv -s "Apple Development: ap@cdfr.net (SQ9LA8W8BB)" dist/app/netcp
 endif
 
 
@@ -46,22 +46,15 @@ run:
 .PHONY: test-ui
 test-ui:
 	cd ui/ && \
+	  yarn lint && \
 	  yarn test:unit
 
 .PHONY: test-api
 test-api:
 	go fmt ./...
-	go test -v ./... -race -coverprofile=coverage.out -covermode=atomic
-
-.PHONY: lint-ui
-lint-ui:
-	cd ui/ && \
-	  yarn lint
-
-.PHONY: lint-api
-lint-api:
-	go fmt ./...
+	go vet ./...
 	golangci-lint run -v
+	go test -v ./... -race -coverprofile=coverage.out -covermode=atomic
 
 .PHONY: clean
 clean:

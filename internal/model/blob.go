@@ -9,8 +9,8 @@ import (
 type Blob struct {
 	Model
 
-	UploadedAt  time.Time `json:"uploaded_at" gorm:"uploaded_at"`
-	DownloadedAt  time.Time `json:"downloaded_at" gorm:"downloaded_at"`
+	UploadedAt   time.Time `json:"uploaded_at" firestore:"uploaded_at"`
+	DownloadedAt time.Time `json:"downloaded_at" firestore:"downloaded_at"`
 }
 
 func (b Blob) String() string {

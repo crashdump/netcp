@@ -6,7 +6,7 @@ import (
 )
 
 type Model struct {
-	ID        uuid.UUID `form:"id" gorm:"type:uuid;primary_key"`
+	ID        uuid.UUID `form:"id" firestore:"type:uuid;primary_key"`
 	CreatedAt time.Time `binding:"-" form:"-"`
 	UpdatedAt time.Time `binding:"-" form:"-"`
 }

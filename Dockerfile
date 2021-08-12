@@ -27,7 +27,6 @@ ENV GOTRACEBACK=single
 # Copy template & assets
 WORKDIR /netcp
 COPY --from=build /app ./app
-COPY index.html index.html
-COPY assets assets/
-
+COPY ui ui/
+COPY docs/swagger swagger/
 ENTRYPOINT ["./app"]
