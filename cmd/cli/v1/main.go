@@ -14,7 +14,7 @@ var (
 	Name    = "netcp"
 
 	cfgDefaults = map[string]interface{}{
-		"api.url": "http://127.0.0.1:3000",
+		"srv.url": "http://127.0.0.1:3000",
 	}
 
 	flagUrl string

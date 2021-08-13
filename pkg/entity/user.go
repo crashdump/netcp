@@ -1,12 +1,13 @@
-package model
+package entity
 
 import (
 	"encoding/json"
 	"errors"
+	"github.com/google/uuid"
 )
 
 type User struct {
-	Model
+	ID           uuid.UUID `form:"id" firestore:"type:uuid"`
 
 	Auth0ID  string `json:"-" firestore:"auth0_id"`
 	APIToken string `json:"-" firestore:"api_token"`

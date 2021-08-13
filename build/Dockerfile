@@ -14,7 +14,7 @@ COPY . ./
 # Skaffold passes in debug-oriented compiler flags
 ARG SKAFFOLD_GO_GCFLAGS
 RUN echo "Go gcflags: ${SKAFFOLD_GO_GCFLAGS}"
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -mod=readonly -v -o /app ./cmd/api/v1/
+RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -mod=readonly -v -o /app ./cmd/srv/v1/
 
 # Now create separate deployment image
 FROM gcr.io/distroless/base
@@ -28,5 +28,5 @@ ENV GOTRACEBACK=single
 WORKDIR /netcp
 COPY --from=build /app ./app
 COPY ui ui/
-COPY docs/swagger swagger/
+COPY api/swagger swagger/
 ENTRYPOINT ["./app"]

@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/crashdump/netcp/internal/model"
+	"github.com/crashdump/netcp/internal/entity"
 )
 
 var (
@@ -25,7 +25,7 @@ func AuthMiddleware() gin.HandlerFunc {
 	// should not be used in production.
 	Domain = "netcp-dev.eu.auth0.com"
 	ClientID = "HlpkvBqBPwLLSTMTpaeI54Gh5H0R73NB"
-	Audience = "http://127.0.0.1:3000/api/v1/"
+	Audience = "http://127.0.0.1:3000/srv/v1/"
 	ApiKey = "15HPj35uON5V77zP1xvNsR1eLCOv4idn"
 
 	return func(c *gin.Context) {
@@ -91,7 +91,7 @@ func checkJwt(r *http.Request) (error, int) {
 
 	id := claims["sub"].(string)
 
-	user := model.User{Auth0ID: id}
+	user := entity.User{Auth0ID: id}
 	log.Println(user)
 
 	//u, err := repo.GetUserByAuth0ID(id)
@@ -124,7 +124,7 @@ func checkJwt(r *http.Request) (error, int) {
 	//	}
 	//}
 	//
-	//ctx := context.WithValue(r.Context(), ContextCurrentUser, u)
+	//ctx := context.WithValue(r.ctx(), ContextCurrentUser, u)
 
 	return nil, http.StatusOK
 }

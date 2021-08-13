@@ -34,7 +34,7 @@ build-api:
 
 .PHONY: build-swagger
 build-swagger: build-api
-	swagger generate spec -o ./docs/swagger/swagger.json
+	swagger generate spec -o ./api/swagger.json
 
 .PHONY: run
 run:

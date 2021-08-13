@@ -25,7 +25,7 @@ server:
 auth:
   domain: netcp-dev.eu.auth0.com
   client_id: HlpkvBqBPwLLSTMTpaeI54Gh5H0R73NB
-  audience: http://127.0.0.1:3000/api/v1/
+  audience: http://127.0.0.1:3000/srv/v1/
   api_key: secret_here
 
 rollbar:
@@ -39,7 +39,7 @@ rollbar:
 
 ```yaml
 api:
-  url: http://127.0.0.1:3000/api/v1
+  url: http://127.0.0.1:3000/srv/v1
 
 auth:
   refresh_token: secret_here

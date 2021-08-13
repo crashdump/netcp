@@ -33,8 +33,9 @@ func New(name string, env string, defaults map[string]interface{}) (*Config, err
 	}
 
 	v := viper.New()
-	v.SetConfigName("netcp" + name + "." + env)
+	v.SetConfigName(name + "." + env + ".yml")
 	v.AddConfigPath(path)
+	v.SetConfigType("yaml")
 
 	for key, value := range defaults {
 		v.SetDefault(key, value)
