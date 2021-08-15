@@ -9,17 +9,23 @@ storage endpoint to store the data while in flight.
 
 Copy files from the source computer:
 
-    computer-1> netcp up FILENAME
+    computer-1> netcp up foo.tar.gz
     uploading: foo.tar.gz
 
     computer-1> netcp ls
-    1334  11 Aug 19:17  foo.tar.gz
-     212  11 Aug 22:14  bar.tar.gz
+    1334  11 Aug 19:17  foo.tar.gz (e84e-445d-9a36)
+     212  11 Aug 22:14  bar.tar.gz (f720-4b05-af3a)
 
-Paste files on the target computer:
+Paste files on the target computer (if you're logged in):
 
-    computer-2> netcp down FILENAME DESTINATION
+    computer-2> netcp down foo.tar.gz /tmp/
     downloading: foo.tar.gz
+
+Paste files on the target computer (if you're not logged in):
+
+    computer-2> netcp down e84e-445d-9a36 /tmp/
+    downloading: foo.tar.gz
+
 
 Note: files are automatically deleted after 48h.
 
