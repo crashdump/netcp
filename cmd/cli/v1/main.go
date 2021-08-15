@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/crashdump/netcp/internal/config"
@@ -25,15 +26,18 @@ func init() {
 }
 
 func main() {
+	log.Printf("%s (%s)", Name, Version)
+
 	// Getting configuration base on environment
 	env := os.Getenv("ENV")
 
-	cfg, err := config.New("ctl", env, cfgDefaults)
+	cfg, err := config.New("cli", env, cfgDefaults)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	cfg.Load()
+
+	err = cfg.Load()
 	if err != nil {
 		fmt.Println(err)
 	}

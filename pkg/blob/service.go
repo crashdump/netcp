@@ -27,7 +27,6 @@ func (s *service) Download(ID uuid.UUID) (*entity.Blob, error) {
 	return s.repository.GetByID(ID)
 }
 
-
 func (s *service) Upload(Blob *entity.Blob) error {
 	return s.repository.Save(Blob)
 }

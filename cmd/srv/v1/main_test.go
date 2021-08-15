@@ -1,53 +1,102 @@
 package main
 
 import (
+	"fmt"
+	"github.com/crashdump/netcp/internal/config"
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
-	retry "github.com/hashicorp/go-retryablehttp"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestService(t *testing.T) {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
+func TestRoutes(t *testing.T) {
+	tests := []struct {
+		description string
+
+		// Test input
+		route string
+
+		// Expected output
+		expectedError bool
+		expectedCode  int
+		expectedBody  string
+	}{
+		// TODO: web ui
+		//{
+		//	description:   "index redirects to ui",
+		//	route:         "/",
+		//	expectedError: false,
+		//	expectedCode:  301,
+		//	expectedBody:  "",
+		//},
+		//{
+		//	description:   "ui",
+		//	route:         "/ui",
+		//	expectedError: false,
+		//	expectedCode:  200,
+		//	expectedBody:  "something",
+		//},
+		{
+			description:   "API status",
+			route:         "/api/v1/status",
+			expectedError: false,
+			expectedCode:  200,
+			expectedBody:  "OK",
+		},
+		{
+			description:   "non existing route",
+			route:         "/i-dont-exist",
+			expectedError: false,
+			expectedCode:  404,
+			expectedBody:  "Cannot GET /i-dont-exist",
+		},
 	}
 
-	url := os.Getenv("SERVICE_URL")
-	if url == "" {
-		url = "http://localhost:" + port
-	}
-
-	retryClient := retry.NewClient()
-	req, err := retry.NewRequest(http.MethodGet, url+"/", nil)
+	cfg, err := config.New("cli", "unittest", cfgDefaults)
 	if err != nil {
-		t.Fatalf("retry.NewRequest: %v", err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	token := os.Getenv("TOKEN")
-	if token != "" {
-		req.Header.Set("Authorization", "Bearer "+token)
-	}
+	// Setup the app as it is done in the main function
+	app := setup(cfg)
 
-	resp, err := retryClient.Do(req)
-	if err != nil {
-		t.Fatalf("retryClient.Do: %v", err)
-	}
+	// Iterate through test single test cases
+	for _, test := range tests {
+		// Create a new http request with the route
+		// from the test case
+		req, _ := http.NewRequest(
+			"GET",
+			test.route,
+			nil,
+		)
 
-	if got := resp.StatusCode; got != http.StatusOK {
-		t.Errorf("HTTP Response: got %q, want %q", got, http.StatusOK)
-	}
+		// Perform the request plain with the app.
+		// The -1 disables request latency.
+		res, err := app.Test(req, -1)
 
-	out, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("ioutil.ReadAll: %v", err)
-	}
+		// verify that no error occurred, that is not expected
+		assert.Equalf(t, test.expectedError, err != nil, test.description)
 
-	want := "Congratulations, you successfully deployed a container image to Cloud Run"
-	if !strings.Contains(string(out), want) {
-		t.Errorf("HTTP Response: body does not include %q", want)
+		// As expected errors lead to broken responses, the next
+		// test case needs to be processed
+		if test.expectedError {
+			continue
+		}
+
+		// Verify if the status code is as expected
+		assert.Equalf(t, test.expectedCode, res.StatusCode, test.description)
+
+		// Read the response body
+		body, err := ioutil.ReadAll(res.Body)
+
+		// Reading the response body should work everytime, such that
+		// the err variable should be nil
+		assert.Nilf(t, err, test.description)
+
+		// Verify, that the response body contains the expected content
+		assert.Containsf(t, string(body), test.expectedBody, test.description)
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	firebase "firebase.google.com/go/v4"
+	_ "github.com/crashdump/netcp/api"
 	"github.com/crashdump/netcp/internal/config"
 	blobStore "github.com/crashdump/netcp/internal/repository/firebase/storage"
 	//middlewares "github.com/crashdump/netcp/internal/middleware"
@@ -22,11 +23,12 @@ var (
 	cfgDefaults = map[string]interface{}{
 		"srv.url":     "http://127.0.0.1:3000",
 		"server.port": "3000",
+		"bucket.name": "cloudcopy-it.appspot.com",
 	}
 )
 
 func main() {
-	ctx := context.Background()
+	log.Printf("%s (%s)", Name, Version)
 
 	env := os.Getenv("GO_ENV")
 	if env == "" {
@@ -48,22 +50,29 @@ func main() {
 	// PORT environment variable is provided by Cloud Run.
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "3000"
 	}
 	cfg.Set("server.port", port)
 
+	app := setup(cfg)
 
-	/*
-	 * Firebase
-	 */
-	fbc, err := firebase.NewApp(ctx, nil)
+	port = cfg.GetString("server.port")
+	log.Printf("server listening on :%s", port)
+	log.Fatal(app.Listen(":" + port))
+}
+
+func setup(cfg *config.Config) *fiber.App {
+	fbc, err := firebase.NewApp(context.Background(), nil)
 	if err != nil {
 		log.Fatalf("error initializing firebase app: %v", err)
 	}
 
-	/*
-	 * Http router
-	 */
+	br, err := blobStore.NewBlobRepo(fbc, cfg.GetString("bucket.name"))
+	if err != nil {
+		log.Fatalf("Unable to open blob repository")
+	}
+	bs := blobService.NewService(br)
+
 	f := fiber.New()
 
 	// CORS
@@ -72,35 +81,20 @@ func main() {
 		cfg.GetString("server.port"),
 	)
 	f.Use(cors.New(cors.Config{
-		AllowOrigins:     url,
-		AllowMethods:     "GET,POST,DELETE",
+		AllowOrigins: url,
+		AllowMethods: "GET,POST,DELETE",
 	}))
 
-	/*
-	 * Routes
-	 */
-	f.Static("/ui/", "ui/dist")
-	f.Static("/swagger/", "cmd/srv/docs")
-
-	// Redirect / to /ui/
-	f.Get("/", func(ctx *fiber.Ctx) error {
-		return ctx.Redirect("/ui/", 301)
-	})
+	// Routes
+	UIRouter(f)
+	SwaggerRouter(f)
 
 	api := f.Group("/api/v1")
 	StatusRouter(api)
 
-	// Blobs
-	br, err := blobStore.NewRepo(fbc, "cloudcopy")
-	if err != nil {
-		log.Fatalf("Unable to open blob repository")
-	}
-	bs := blobService.NewService(br)
-	BlobRouter(api, bs)
-
 	//api.Use(middlewares.AuthMiddleware())
 
-	port = cfg.GetString("server.port")
-	log.Printf("server listening on :%s", port)
-	log.Fatal(f.Listen(":" + port))
+	BlobRouter(api, bs)
+
+	return f
 }

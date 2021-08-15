@@ -1,6 +1,7 @@
 package config
 
 import (
+	"log"
 	"os"
 	"os/user"
 	"testing"
@@ -27,7 +28,7 @@ type testCfgHarness struct {
 var testCfgString1 = testCfgHarness{"string.one", "a"}
 var testCfgString2 = testCfgHarness{"string.two.three", "b"}
 var testCfgInt = testCfgHarness{"int.one", 1}
-var testCfgBool = testCfgHarness{"true", true}
+var testCfgBool = testCfgHarness{"test", true}
 var testCfgFileYaml = `---
 string:
   one: a
@@ -35,30 +36,35 @@ string:
     three: b
 int:
   one: 1
-true: true
+test: true
 `
 
 //var testCfgNewBool = testCfgHarness{"this_is_new", true}
 
 func writeMockConfigFile(t *testing.T) {
-	user, err := user.Current()
+	u, err := user.Current()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	path := user.HomeDir + "/.netcp"
+	path := u.HomeDir + "/.netcp"
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(path, 0700)
+		err = os.Mkdir(path, 0700)
+		if err != nil {
+			log.Printf("Cannot create directory %s", path)
+		}
 	}
-	f, err := os.Create(path + "/netcp.test.yaml")
+
+	f, err := os.Create(path + "/mock.unittest.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
+
 	_, err = f.Write([]byte(testCfgFileYaml))
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Close()
+	_ = f.Close()
 }
 
 func TestConfigTestSuite(t *testing.T) {
@@ -69,7 +75,7 @@ func TestConfigTestSuite(t *testing.T) {
 
 func (ts *TestSuite) SetupTest() {
 	var err error
-	ts.cfg, err = New("app", "test", cfgDefaults)
+	ts.cfg, err = New("mock", "unittest", cfgDefaults)
 	ts.NoError(err)
 
 	err = ts.cfg.Load()

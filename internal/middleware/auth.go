@@ -2,14 +2,14 @@ package middlewares
 
 import (
 	"fmt"
-	auth0 "github.com/auth0-community/go-auth0"
-	"github.com/gin-gonic/gin"
-	jose "gopkg.in/square/go-jose.v2"
 	"log"
 	"net/http"
 	"strings"
 
-	"github.com/crashdump/netcp/internal/entity"
+	auth0 "github.com/auth0-community/go-auth0"
+	"github.com/crashdump/netcp/pkg/entity"
+	"github.com/gin-gonic/gin"
+	jose "gopkg.in/square/go-jose.v2"
 )
 
 var (

@@ -5,13 +5,12 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"github.com/crashdump/netcp/pkg/entity"
 	"github.com/google/uuid"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"testing"
 	"time"
 )
 
-var testBlobs = entity.Blobs {
+var testBlobs = entity.Blobs{
 	{
 		ID:        uuid.New(),
 		Name:      "test.tar.gz",
@@ -31,26 +30,29 @@ func TestRepositoryTestSuite(t *testing.T) {
 	suite.Run(t, new(BlobRepositoryTestSuite))
 }
 
-func (suite *BlobRepositoryTestSuite) NewTest(t *testing.T) {
+func (suite *BlobRepositoryTestSuite) SetupTest() {
 	var err error
 	ctx := context.Background()
 
-	fbcli, err := firebase.NewApp(ctx, &firebase.Config{
-		ProjectID: "cloudcopy-it",
-	})
-	assert.NoError(t, err)
+	projectId := "cloudcopy-it"
+	bucketName := "cloudcopy-it.appspot.com"
 
-	suite.blobRepository, err = NewRepo(fbcli, "cloudcopy-it")
-	assert.NoError(t, err)
+	fbcli, err := firebase.NewApp(ctx, &firebase.Config{
+		ProjectID: projectId,
+	})
+	suite.NoError(err)
+
+	suite.blobRepository, err = NewBlobRepo(fbcli, bucketName)
+	suite.NoError(err)
 }
 
-func (suite *BlobRepositoryTestSuite) TestBlobRepository(t *testing.T) {
+func (suite *BlobRepositoryTestSuite) TestBlobRepository() {
 	for _, b := range testBlobs {
 		err := suite.blobRepository.Save(&b)
-		assert.NoError(t, err)
+		suite.NoError(err)
 
 		blob, err := suite.blobRepository.GetByID(b.ID)
-		assert.NoError(t, err)
-		assert.Equal(t, b.Content, blob.Content)
+		suite.NoError(err)
+		suite.Equal(b.Content, blob.Content)
 	}
 }

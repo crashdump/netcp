@@ -1,35 +1,41 @@
 package main
 
 import (
+	"encoding/base64"
 	"github.com/crashdump/netcp/pkg/blob"
 	"github.com/crashdump/netcp/pkg/entity"
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
-
-func BlobRouter(app fiber.Router, service blob.Service) {
-	app.Get("/blob", getBlob(service))
-	app.Post("/blob", addBlob(service))
-	app.Delete("/blob", removeBlob(service))
+func BlobRouter(f fiber.Router, service blob.Service) {
+	f.Post("/blob", addBlob(service))
+	f.Get("/blob/:id", getBlob(service))
+	f.Delete("/blob/:id", removeBlob(service))
 }
 
 func getBlob(service blob.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		fetched, err := service.Download()
-		var result fiber.Map
+		id, err := uuid.Parse(c.Params("id"))
 		if err != nil {
-			result = fiber.Map{
-				"status": false,
-				"error":  err.Error(),
-			}
-		} else {
-			result = fiber.Map{
-				"status": true,
-				"Blobs":  fetched,
-			}
+			return c.JSON(&API{
+				Success: false,
+				Message: "invalid UUID",
+			})
 		}
 
-		return c.JSON(&result)
+		fetched, err := service.Download(id)
+		if err != nil {
+			return c.JSON(&API{
+				Success: false,
+				Message: err.Error(),
+			})
+		}
+
+		return c.JSON(&API{
+			Success: true,
+			Content: base64.StdEncoding.EncodeToString(fetched.Content),
+		})
 	}
 }
 
@@ -38,41 +44,47 @@ func addBlob(service blob.Service) fiber.Handler {
 		var requestBody entity.Blob
 		err := c.BodyParser(&requestBody)
 		if err != nil {
-			_ = c.JSON(&fiber.Map{
-				"success": false,
-				"error":   err,
+			_ = c.JSON(&API{
+				Success: false,
+				Message: err.Error(),
 			})
 		}
-		result, dberr := service.Upload(&requestBody)
-		return c.JSON(&fiber.Map{
-			"status": result,
-			"error":  dberr,
-		})
+
+		err = service.Upload(&requestBody)
+		if err != nil {
+			return c.JSON(&API{
+				Success: false,
+				Message: err.Error(),
+			})
+		} else {
+			return c.JSON(&API{
+				Success: true,
+				Message: "Successfully uploaded",
+			})
+		}
 	}
 }
 
-
 func removeBlob(service blob.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var requestBody entity.Blob
-		err := c.BodyParser(&requestBody)
-		BlobID := requestBody.ID
+		id, err := uuid.Parse(c.Params("id"))
 		if err != nil {
-			_ = c.JSON(&fiber.Map{
-				"status": false,
-				"error":  err,
+			return c.JSON(&API{
+				Success: false,
+				Message: "Invalid UUID",
 			})
 		}
-		dberr := service.RemoveBlob(BlobID)
+
+		dberr := service.Remove(id)
 		if dberr != nil {
-			_ = c.JSON(&fiber.Map{
-				"status": false,
-				"error":  err,
+			_ = c.JSON(&API{
+				Success: false,
+				Message: err.Error(),
 			})
 		}
-		return c.JSON(&fiber.Map{
-			"status":  false,
-			"message": "updated successfully",
+		return c.JSON(&API{
+			Success: true,
+			Message: "Successfully removed",
 		})
 	}
 }

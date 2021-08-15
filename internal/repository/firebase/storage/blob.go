@@ -18,14 +18,14 @@ type BlobRepository interface {
 	Delete(ID uuid.UUID) error
 }
 
-type repository struct {
+type blobRepository struct {
 	ctx           context.Context
 	StorageClient *storage.Client
 	BucketName    string
 }
 
-//NewRepo is the single instance repo that is being created.
-func NewRepo(fc *firebase.App, bucketName string) (BlobRepository, error) {
+//NewBlobRepo is the single instance repo that is being created.
+func NewBlobRepo(fc *firebase.App, bucketName string) (BlobRepository, error) {
 	ctx := context.Background()
 
 	s, err := fc.Storage(ctx)
@@ -34,20 +34,24 @@ func NewRepo(fc *firebase.App, bucketName string) (BlobRepository, error) {
 		return nil, err
 	}
 
-	return &repository{
+	br := &blobRepository{
 		ctx:           ctx,
 		BucketName:    bucketName,
 		StorageClient: s,
-	}, nil
+	}
+
+	//err = br.SetLifecycleManagement()
+
+	return br, err
 }
 
-func (r *repository) GetByID(id uuid.UUID) (*entity.Blob, error) {
+func (r *blobRepository) GetByID(id uuid.UUID) (*entity.Blob, error) {
 	//
 
 	return &entity.Blob{}, nil
 }
 
-func (r *repository) Save(blob *entity.Blob) error {
+func (r *blobRepository) Save(blob *entity.Blob) error {
 	b, err := r.StorageClient.Bucket(r.BucketName)
 	if err != nil {
 		log.Printf("Unable to open Firebase storage bucket")
@@ -56,7 +60,7 @@ func (r *repository) Save(blob *entity.Blob) error {
 	bw.ContentType = "application/gzip" // https://datatracker.ietf.org/doc/html/rfc6713
 	bw.Metadata = map[string]string{
 		// TODO: "x-goog-meta-owner-id": TBD,
-		"x-goog-meta-filename": blob.Name,
+		"x-goog-meta-filename":   blob.Name,
 		"x-goog-meta-created-at": time.Now().String(),
 	}
 
@@ -72,7 +76,7 @@ func (r *repository) Save(blob *entity.Blob) error {
 	return nil
 }
 
-func (r *repository) Delete(uuid uuid.UUID) error {
+func (r *blobRepository) Delete(uuid uuid.UUID) error {
 	//
 
 	return nil

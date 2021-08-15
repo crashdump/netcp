@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID           uuid.UUID `form:"id" firestore:"type:uuid"`
+	ID uuid.UUID `form:"id" firestore:"type:uuid"`
 
 	Auth0ID  string `json:"-" firestore:"auth0_id"`
 	APIToken string `json:"-" firestore:"api_token"`

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/viper"
+	"log"
 	"os"
 	"os/user"
 )
@@ -21,19 +22,22 @@ func New(name string, env string, defaults map[string]interface{}) (*Config, err
 		return nil, errors.New("please provide 'name' and 'env'")
 	}
 
-	user, err := user.Current()
+	u, err := user.Current()
 	if err != nil {
 		return nil, err
 	}
 
-	path := fmt.Sprintf("%s/.netcp/", user.HomeDir)
+	path := fmt.Sprintf("%s/.netcp/", u.HomeDir)
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		os.Mkdir(path, 0700)
+		err = os.Mkdir(path, 0700)
+		if err != nil {
+			log.Printf("Cannot create directory %s", path)
+		}
 	}
 
 	v := viper.New()
-	v.SetConfigName(name + "." + env + ".yml")
+	v.SetConfigName(name + "." + env + ".yaml")
 	v.AddConfigPath(path)
 	v.SetConfigType("yaml")
 
@@ -54,7 +58,7 @@ func (c *Config) Load() error {
 	fmt.Printf("Loading %s\n", c.viper.ConfigFileUsed())
 
 	err := c.viper.ReadInConfig()
-	if err != nil {
+	if err != nil && err != err.(viper.ConfigFileNotFoundError) {
 		fmt.Print("error reading config file: ", err)
 		return err
 	}
