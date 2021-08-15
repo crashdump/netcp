@@ -12,9 +12,7 @@ Copy files from the source computer:
     computer-1> netcp up FILENAME
     uploading: foo.tar.gz
 
-List files in the cloud clipboard:
-
-    computer-2> netcp ls
+    computer-1> netcp ls
     1334  11 Aug 19:17  foo.tar.gz
      212  11 Aug 22:14  bar.tar.gz
 

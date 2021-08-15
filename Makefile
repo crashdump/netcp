@@ -54,7 +54,6 @@ run:
 test-srv:
 	go fmt ./...
 	go vet ./...
-	golangci-lint run -v
 	go test -v ./... -race -coverprofile=coverage.out -covermode=atomic
 
 .PHONY: clean
