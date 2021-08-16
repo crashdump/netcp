@@ -1,4 +1,4 @@
-package storage
+package files
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 )
 
 // SetLifecycleManagement adds a lifecycle delete rule with the condition that the object is 2 days old.
-func (r *blobRepository) SetLifecycleManagement() error {
+func (r *repository) SetLifecycleManagement() error {
 	ctx := context.Background()
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
@@ -43,7 +43,7 @@ func (r *blobRepository) SetLifecycleManagement() error {
 }
 
 // DisableLifecycleManagement removes all existing lifecycle rules from the bucket.
-func (r *blobRepository) DisableLifecycleManagement() error {
+func (r *repository) DisableLifecycleManagement() error {
 	ctx := context.Background()
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*10)

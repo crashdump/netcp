@@ -1,4 +1,4 @@
-package firestore
+package metadata
 
 import (
 	"context"
@@ -23,7 +23,7 @@ var testBlobs = entity.BlobMetadatas{
 
 type BlobRepositoryTestSuite struct {
 	suite.Suite
-	blobIndexRepository BlobIndexRepository
+	blobIndexRepository Repository
 }
 
 // We need this function to kick off the test suite,
@@ -41,7 +41,7 @@ func (suite *BlobRepositoryTestSuite) SetupTest() {
 	})
 	suite.NoError(err)
 
-	suite.blobIndexRepository, err = NewBlobIndexRepo(fbcli)
+	suite.blobIndexRepository, err = NewMetadataRepo(fbcli)
 	suite.NoError(err)
 }
 

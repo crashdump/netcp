@@ -9,7 +9,8 @@ import (
 	firebase "firebase.google.com/go/v4"
 	_ "github.com/crashdump/netcp/api"
 	"github.com/crashdump/netcp/internal/config"
-	blobStore "github.com/crashdump/netcp/internal/repository/firebase/storage"
+	fileStore "github.com/crashdump/netcp/internal/repository/firebase/files"
+	metadataStore "github.com/crashdump/netcp/internal/repository/firebase/metadata"
 	//middlewares "github.com/crashdump/netcp/internal/middleware"
 	blobService "github.com/crashdump/netcp/pkg/blob"
 	"github.com/gofiber/fiber/v2"
@@ -67,11 +68,19 @@ func setup(cfg *config.Config) *fiber.App {
 		log.Fatalf("error initializing firebase app: %v", err)
 	}
 
-	br, err := blobStore.NewBlobRepo(fbc, cfg.GetString("bucket.name"))
+	// Init File store
+	br, err := fileStore.NewBlobRepo(fbc, cfg.GetString("bucket.name"))
 	if err != nil {
 		log.Fatalf("Unable to open blob repository")
 	}
-	bs := blobService.NewService(br)
+
+	// Init Metadata store
+	mr, err := metadataStore.NewMetadataRepo(fbc)
+	if err != nil {
+		log.Fatalf("Unable to open blob repository")
+	}
+
+	bs := blobService.NewService(br, mr)
 
 	f := fiber.New()
 

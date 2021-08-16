@@ -89,9 +89,9 @@ func checkJwt(r *http.Request) (error, int) {
 		return err, http.StatusBadRequest
 	}
 
-	id := claims["sub"].(string)
+	//id := claims["sub"].(string)
 
-	user := entity.User{Auth0ID: id}
+	user := entity.User{}
 	log.Println(user)
 
 	//u, err := repo.GetUserByAuth0ID(id)

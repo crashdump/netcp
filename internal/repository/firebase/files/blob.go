@@ -1,4 +1,4 @@
-package storage
+package files
 
 import (
 	"context"
@@ -11,20 +11,20 @@ import (
 	"github.com/crashdump/netcp/pkg/entity"
 )
 
-type BlobRepository interface {
-	Save(blobMetadata *entity.BlobMetadata, blob *entity.Blob) error
-	GetByID(blobMetadata *entity.BlobMetadata) (entity.Blob, error)
-	Delete(blobMetadata *entity.BlobMetadata) error
+type Repository interface {
+	Save(blobMetadata entity.BlobMetadata, blob *entity.Blob) error
+	GetByID(blobMetadata entity.BlobMetadata) (*entity.Blob, error)
+	Delete(blobMetadata entity.BlobMetadata) error
 }
 
-type blobRepository struct {
+type repository struct {
 	ctx           context.Context
 	StorageClient *storage.Client
 	BucketHandle  *storage.BucketHandle
 }
 
 //NewBlobRepo is the single instance repo that is being created.
-func NewBlobRepo(fc *firebase.App, bucketName string) (BlobRepository, error) {
+func NewBlobRepo(fc *firebase.App, bucketName string) (Repository, error) {
 	ctx := context.Background()
 
 	s, err := fc.Storage(ctx)
@@ -38,14 +38,14 @@ func NewBlobRepo(fc *firebase.App, bucketName string) (BlobRepository, error) {
 		log.Printf("Unable to open Firebase storage bucket")
 	}
 
-	br := &blobRepository{
-		ctx:           ctx,
-		BucketHandle:  bucketHandle,
+	br := &repository{
+		ctx:          ctx,
+		BucketHandle: bucketHandle,
 	}
 	return br, err
 }
 
-func (r *blobRepository) GetByID(blobMetadata *entity.BlobMetadata) (entity.Blob, error) {
+func (r *repository) GetByID(blobMetadata entity.BlobMetadata) (*entity.Blob, error) {
 	var blob entity.Blob
 
 	ctx, cancel := context.WithTimeout(r.ctx, time.Second*50)
@@ -54,26 +54,26 @@ func (r *blobRepository) GetByID(blobMetadata *entity.BlobMetadata) (entity.Blob
 	filePath := blobMetadata.OwnerID.String() + "/" + blobMetadata.ID.String()
 	br, err := r.BucketHandle.Object(filePath).NewReader(ctx)
 	if err != nil {
-		return blob, err
+		return &blob, err
 	}
 
 	blob.Content, err = ioutil.ReadAll(br)
 	if err != nil {
 		log.Printf("GetByID(): unable to read file %q: %v", blobMetadata.Filename, err)
-		return blob, err
+		return &blob, err
 	}
 
 	if err := br.Close(); err != nil {
-		log.Printf("GetByID(): unable to close bucket after file write %q: %v",  blobMetadata.Filename, err)
-		return blob, err
+		log.Printf("GetByID(): unable to close bucket after file write %q: %v", blobMetadata.Filename, err)
+		return &blob, err
 	}
 
 	log.Printf("GetByID(): downloaded file %s", filePath)
 
-	return blob, nil
+	return &blob, nil
 }
 
-func (r *blobRepository) Save(blobMetadata *entity.BlobMetadata, blob *entity.Blob) error {
+func (r *repository) Save(blobMetadata entity.BlobMetadata, blob *entity.Blob) error {
 	ctx, cancel := context.WithTimeout(r.ctx, time.Second*50)
 	defer cancel()
 
@@ -86,7 +86,7 @@ func (r *blobRepository) Save(blobMetadata *entity.BlobMetadata, blob *entity.Bl
 		return err
 	}
 	if err := bw.Close(); err != nil {
-		log.Printf("Save(): unable to close bucket after file write %q: %v",  blobMetadata.Filename, err)
+		log.Printf("Save(): unable to close bucket after file write %q: %v", blobMetadata.Filename, err)
 		return err
 	}
 
@@ -95,7 +95,7 @@ func (r *blobRepository) Save(blobMetadata *entity.BlobMetadata, blob *entity.Bl
 	return nil
 }
 
-func (r *blobRepository) Delete(blobMetadata *entity.BlobMetadata) error {
+func (r *repository) Delete(blobMetadata entity.BlobMetadata) error {
 	filePath := blobMetadata.OwnerID.String() + "/" + blobMetadata.ID.String()
 	return r.BucketHandle.Object(filePath).Delete(r.ctx)
 }

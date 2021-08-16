@@ -24,7 +24,7 @@ func getBlob(service blob.Service) fiber.Handler {
 			})
 		}
 
-		fetched, err := service.Download(id)
+		fetched, err := service.DownloadByID(id)
 		if err != nil {
 			return c.JSON(&API{
 				Success: false,
@@ -41,7 +41,7 @@ func getBlob(service blob.Service) fiber.Handler {
 
 func addBlob(service blob.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var requestBody entity.BlobMetadata
+		var requestBody entity.Blob
 		err := c.BodyParser(&requestBody)
 		if err != nil {
 			_ = c.JSON(&API{
@@ -50,7 +50,7 @@ func addBlob(service blob.Service) fiber.Handler {
 			})
 		}
 
-		err = service.Upload(&requestBody)
+		err = service.Upload("filex", &requestBody)
 		if err != nil {
 			return c.JSON(&API{
 				Success: false,

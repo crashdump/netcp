@@ -1,4 +1,4 @@
-package firestore
+package metadata
 
 import (
 	"context"
@@ -10,20 +10,20 @@ import (
 	"github.com/crashdump/netcp/pkg/entity"
 )
 
-type BlobIndexRepository interface {
+type Repository interface {
 	GetByID(ID uuid.UUID, owner uuid.UUID) (entity.BlobMetadata, error)
 	GetByShortID(ID string, owner uuid.UUID) (entity.BlobMetadata, error)
 	Save(blob *entity.BlobMetadata) error
 	Delete(blob *entity.BlobMetadata) error
 }
 
-type blobIndexRepository struct {
+type repository struct {
 	ctx             context.Context
 	FirestoreClient *firestore.Client
 }
 
-//NewBlobIndexRepo is the single instance repo that is being created.
-func NewBlobIndexRepo(fc *firebase.App) (BlobIndexRepository, error) {
+//NewMetadataRepo is the single instance repo that is being created.
+func NewMetadataRepo(fc *firebase.App) (Repository, error) {
 	ctx := context.Background()
 
 	s, err := fc.Firestore(ctx)
@@ -32,7 +32,7 @@ func NewBlobIndexRepo(fc *firebase.App) (BlobIndexRepository, error) {
 		return nil, err
 	}
 
-	bir := &blobIndexRepository{
+	bir := &repository{
 		ctx:             ctx,
 		FirestoreClient: s,
 	}
@@ -42,7 +42,7 @@ func NewBlobIndexRepo(fc *firebase.App) (BlobIndexRepository, error) {
 	return bir, err
 }
 
-func (b blobIndexRepository) GetByID(id uuid.UUID, owner uuid.UUID) (entity.BlobMetadata, error) {
+func (b repository) GetByID(id uuid.UUID, owner uuid.UUID) (entity.BlobMetadata, error) {
 	var blob entity.BlobMetadata
 
 	doc, err := b.FirestoreClient.
@@ -74,7 +74,7 @@ func (b blobIndexRepository) GetByID(id uuid.UUID, owner uuid.UUID) (entity.Blob
 	return blob, err
 }
 
-func (b blobIndexRepository) GetByShortID(id string, owner uuid.UUID) (entity.BlobMetadata, error) {
+func (b repository) GetByShortID(id string, owner uuid.UUID) (entity.BlobMetadata, error) {
 	var blob entity.BlobMetadata
 
 	iter := b.FirestoreClient.
@@ -91,7 +91,7 @@ func (b blobIndexRepository) GetByShortID(id string, owner uuid.UUID) (entity.Bl
 		return blob, err
 	}
 
-	if !docs[0].Exists(){
+	if !docs[0].Exists() {
 		log.Printf("GetByShortID() document not found: users/%s/blobs/%s, err: %s", blob.OwnerID, blob.ID, err)
 	}
 
@@ -108,7 +108,7 @@ func (b blobIndexRepository) GetByShortID(id string, owner uuid.UUID) (entity.Bl
 	return blob, nil
 }
 
-func (b blobIndexRepository) Save(blob *entity.BlobMetadata) error {
+func (b repository) Save(blob *entity.BlobMetadata) error {
 	ownerId := blob.OwnerID.String()
 	docId := blob.ID.String()
 
@@ -128,7 +128,7 @@ func (b blobIndexRepository) Save(blob *entity.BlobMetadata) error {
 	return nil
 }
 
-func (b blobIndexRepository) Delete(blob *entity.BlobMetadata) error {
+func (b repository) Delete(blob *entity.BlobMetadata) error {
 	ownerId := blob.OwnerID.String()
 	docId := blob.ID.String()
 
