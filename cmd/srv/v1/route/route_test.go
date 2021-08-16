@@ -1,4 +1,4 @@
-package main
+package route
 
 import (
 	"fmt"
@@ -54,14 +54,23 @@ func TestRoutes(t *testing.T) {
 		},
 	}
 
-	cfg, err := config.New("cli", "unittest", cfgDefaults)
+	cfg, err := config.New("srv", "unittest", map[string]interface{}{
+		"server.host": "127.0.0.1",
+		"server.port": "3000",
+		"bucket.name": "cloudcopy-it.appspot.com",
+	})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	err = cfg.ValidateServer()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	// Setup the app as it is done in the main function
-	app := setup(cfg)
+	app := Setup(cfg)
 
 	// Iterate through test single test cases
 	for _, test := range tests {

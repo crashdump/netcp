@@ -1,4 +1,4 @@
-package main
+package route
 
 import (
 	swagger "github.com/arsmn/fiber-swagger/v2"

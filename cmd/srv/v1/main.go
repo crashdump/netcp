@@ -1,20 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
+	"github.com/crashdump/netcp/cmd/srv/v1/route"
 	"log"
 	"os"
 
-	firebase "firebase.google.com/go/v4"
 	_ "github.com/crashdump/netcp/api"
 	"github.com/crashdump/netcp/internal/config"
-	fileStore "github.com/crashdump/netcp/internal/repository/firebase/files"
-	metadataStore "github.com/crashdump/netcp/internal/repository/firebase/metadata"
-	//middlewares "github.com/crashdump/netcp/internal/middleware"
-	blobService "github.com/crashdump/netcp/pkg/blob"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 var (
@@ -22,7 +15,7 @@ var (
 	Name    = "netcp-srv"
 
 	cfgDefaults = map[string]interface{}{
-		"srv.url":     "http://127.0.0.1:3000",
+		"server.host": "127.0.0.1",
 		"server.port": "3000",
 		"bucket.name": "cloudcopy-it.appspot.com",
 	}
@@ -48,6 +41,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	err = cfg.ValidateServer()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
 	// PORT environment variable is provided by Cloud Run.
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -55,55 +54,9 @@ func main() {
 	}
 	cfg.Set("server.port", port)
 
-	app := setup(cfg)
+	app := route.Setup(cfg)
 
 	port = cfg.GetString("server.port")
 	log.Printf("server listening on :%s", port)
 	log.Fatal(app.Listen(":" + port))
-}
-
-func setup(cfg *config.Config) *fiber.App {
-	fbc, err := firebase.NewApp(context.Background(), nil)
-	if err != nil {
-		log.Fatalf("error initializing firebase app: %v", err)
-	}
-
-	// Init File store
-	br, err := fileStore.NewBlobRepo(fbc, cfg.GetString("bucket.name"))
-	if err != nil {
-		log.Fatalf("Unable to open blob repository")
-	}
-
-	// Init Metadata store
-	mr, err := metadataStore.NewMetadataRepo(fbc)
-	if err != nil {
-		log.Fatalf("Unable to open blob repository")
-	}
-
-	bs := blobService.NewService(br, mr)
-
-	f := fiber.New()
-
-	// CORS
-	url := fmt.Sprintf("http://%s:%s",
-		cfg.GetString("server.hostname"),
-		cfg.GetString("server.port"),
-	)
-	f.Use(cors.New(cors.Config{
-		AllowOrigins: url,
-		AllowMethods: "GET,POST,DELETE",
-	}))
-
-	// Routes
-	UIRouter(f)
-	SwaggerRouter(f)
-
-	api := f.Group("/api/v1")
-	StatusRouter(api)
-
-	//api.Use(middlewares.AuthMiddleware())
-
-	BlobRouter(api, bs)
-
-	return f
 }

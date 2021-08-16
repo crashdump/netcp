@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/crashdump/netcp/internal/config"
-	//"github.com/crashdump/netcp/pkg/sdk/v1"
+	"github.com/crashdump/netcp/pkg/netcp"
 )
 
 var (
@@ -22,7 +22,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&flagUrl, "url", "http://127.0.0.1:3000", "URL of Netcp API")
+	flag.StringVar(&flagUrl, "url", "http://127.0.0.1:3000", "Server URL")
 }
 
 func main() {
@@ -42,5 +42,16 @@ func main() {
 		fmt.Println(err)
 	}
 
-	// ...
+	err = cfg.ValidateClient()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	o, err := netcp.New(cfg.GetString("srv.url"))
+	if err != nil {
+		log.Fatalf("cannot fetch bearer token: %v", err)
+	}
+
+	fmt.Printf("Status: %s", o.Status())
 }

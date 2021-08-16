@@ -1,4 +1,4 @@
-package browser
+package helper
 
 import (
 	"os"

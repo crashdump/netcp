@@ -1,4 +1,4 @@
-package main
+package entity
 
 type API struct {
 	Code    int    `json:"code"`
