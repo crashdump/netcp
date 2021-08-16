@@ -6,18 +6,33 @@ import (
 	"github.com/crashdump/netcp/pkg/entity"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
+	"github.com/teris-io/shortid"
+	"strings"
 	"testing"
 	"time"
 )
 
-var testBlobs = entity.Blobs{
-	{
-		ID:        uuid.New(),
-		Name:      "test.tar.gz",
-		CreatedAt: time.Now(),
-		Content:   nil,
-	},
-}
+
+var (
+	testBlobs = []struct {
+		blobMetadata entity.BlobMetadata
+		blob         entity.Blob
+	}{
+		{
+			blobMetadata: entity.BlobMetadata{
+				ID:        uuid.MustParse("66ee4e6f-cae6-42b2-ad57-2bbb12b9b67c"),
+				ShortID:   shortid.MustGenerate(),
+				OwnerID:   uuid.MustParse("00000000-7357-1111-7357-000000000000"),
+				Filename:  "foo.tar.gz",
+				CreatedAt: time.Now(),
+			},
+			blob:         entity.Blob{
+				ID:        uuid.MustParse("66ee4e6f-cae6-42b2-ad57-2bbb12b9b67c"),
+				Content:   []byte(strings.Repeat("f", 128*4) + "\n"),
+				},
+		},
+	}
+)
 
 type BlobRepositoryTestSuite struct {
 	suite.Suite
@@ -48,11 +63,17 @@ func (suite *BlobRepositoryTestSuite) SetupTest() {
 
 func (suite *BlobRepositoryTestSuite) TestBlobRepository() {
 	for _, b := range testBlobs {
-		err := suite.blobRepository.Save(&b)
+		err := suite.blobRepository.Save(&b.blobMetadata, &b.blob)
 		suite.NoError(err)
 
-		blob, err := suite.blobRepository.GetByID(b.ID)
+		blobByID, err := suite.blobRepository.GetByID(&b.blobMetadata)
 		suite.NoError(err)
-		suite.Equal(b.Content, blob.Content)
+		suite.Equal(b.blob.Content, blobByID.Content)
+
+		err = suite.blobRepository.Delete(&b.blobMetadata)
+		suite.NoError(err)
+
+		_, err = suite.blobRepository.GetByID(&b.blobMetadata)
+		suite.Error(err)
 	}
 }

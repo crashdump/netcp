@@ -7,8 +7,8 @@ import (
 )
 
 type Service interface {
-	Download(ID uuid.UUID) (*entity.Blob, error)
-	Upload(Blob *entity.Blob) error
+	Download(ID uuid.UUID) (*entity.BlobMetadata, error)
+	Upload(Blob *entity.BlobMetadata) error
 	Remove(ID uuid.UUID) error
 }
 
@@ -23,11 +23,11 @@ func NewService(r storage.BlobRepository) Service {
 	}
 }
 
-func (s *service) Download(ID uuid.UUID) (*entity.Blob, error) {
+func (s *service) Download(ID uuid.UUID) (*entity.BlobMetadata, error) {
 	return s.repository.GetByID(ID)
 }
 
-func (s *service) Upload(Blob *entity.Blob) error {
+func (s *service) Upload(Blob *entity.BlobMetadata) error {
 	return s.repository.Save(Blob)
 }
 

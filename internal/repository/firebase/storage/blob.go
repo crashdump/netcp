@@ -2,26 +2,25 @@ package storage
 
 import (
 	"context"
+	"io/ioutil"
 	"log"
-	"strings"
 	"time"
 
+	"cloud.google.com/go/storage"
 	firebase "firebase.google.com/go/v4"
-	"firebase.google.com/go/v4/storage"
 	"github.com/crashdump/netcp/pkg/entity"
-	"github.com/google/uuid"
 )
 
 type BlobRepository interface {
-	Save(blob *entity.Blob) error
-	GetByID(ID uuid.UUID) (*entity.Blob, error)
-	Delete(ID uuid.UUID) error
+	Save(blobMetadata *entity.BlobMetadata, blob *entity.Blob) error
+	GetByID(blobMetadata *entity.BlobMetadata) (entity.Blob, error)
+	Delete(blobMetadata *entity.BlobMetadata) error
 }
 
 type blobRepository struct {
 	ctx           context.Context
 	StorageClient *storage.Client
-	BucketName    string
+	BucketHandle  *storage.BucketHandle
 }
 
 //NewBlobRepo is the single instance repo that is being created.
@@ -34,50 +33,69 @@ func NewBlobRepo(fc *firebase.App, bucketName string) (BlobRepository, error) {
 		return nil, err
 	}
 
-	br := &blobRepository{
-		ctx:           ctx,
-		BucketName:    bucketName,
-		StorageClient: s,
-	}
-
-	//err = br.SetLifecycleManagement()
-
-	return br, err
-}
-
-func (r *blobRepository) GetByID(id uuid.UUID) (*entity.Blob, error) {
-	//
-
-	return &entity.Blob{}, nil
-}
-
-func (r *blobRepository) Save(blob *entity.Blob) error {
-	b, err := r.StorageClient.Bucket(r.BucketName)
+	bucketHandle, err := s.Bucket(bucketName)
 	if err != nil {
 		log.Printf("Unable to open Firebase storage bucket")
 	}
-	bw := b.Object(blob.ID.String()).NewWriter(r.ctx)
-	bw.ContentType = "application/gzip" // https://datatracker.ietf.org/doc/html/rfc6713
-	bw.Metadata = map[string]string{
-		// TODO: "x-goog-meta-owner-id": TBD,
-		"x-goog-meta-filename":   blob.Name,
-		"x-goog-meta-created-at": time.Now().String(),
+
+	br := &blobRepository{
+		ctx:           ctx,
+		BucketHandle:  bucketHandle,
+	}
+	return br, err
+}
+
+func (r *blobRepository) GetByID(blobMetadata *entity.BlobMetadata) (entity.Blob, error) {
+	var blob entity.Blob
+
+	ctx, cancel := context.WithTimeout(r.ctx, time.Second*50)
+	defer cancel()
+
+	filePath := blobMetadata.OwnerID.String() + "/" + blobMetadata.ID.String()
+	br, err := r.BucketHandle.Object(filePath).NewReader(ctx)
+	if err != nil {
+		return blob, err
 	}
 
-	if _, err := bw.Write([]byte(strings.Repeat("f", 1024*4) + "\n")); err != nil {
-		log.Printf("createFile: unable to write data to bucket %q, file %q: %v", r.BucketName, blob.Name, err)
+	blob.Content, err = ioutil.ReadAll(br)
+	if err != nil {
+		log.Printf("GetByID(): unable to read file %q: %v", blobMetadata.Filename, err)
+		return blob, err
+	}
+
+	if err := br.Close(); err != nil {
+		log.Printf("GetByID(): unable to close bucket after file write %q: %v",  blobMetadata.Filename, err)
+		return blob, err
+	}
+
+	log.Printf("GetByID(): downloaded file %s", filePath)
+
+	return blob, nil
+}
+
+func (r *blobRepository) Save(blobMetadata *entity.BlobMetadata, blob *entity.Blob) error {
+	ctx, cancel := context.WithTimeout(r.ctx, time.Second*50)
+	defer cancel()
+
+	filePath := blobMetadata.OwnerID.String() + "/" + blobMetadata.ID.String()
+	bw := r.BucketHandle.Object(filePath).NewWriter(ctx)
+	bw.ContentType = "application/gzip" // https://datatracker.ietf.org/doc/html/rfc6713
+
+	if _, err := bw.Write(blob.Content); err != nil {
+		log.Printf("Save(): unable to write file %q: %v", blobMetadata.Filename, err)
 		return err
 	}
 	if err := bw.Close(); err != nil {
-		log.Printf("createFile: unable to close bucket %q, file %q: %v", r.BucketName, blob.Name, err)
+		log.Printf("Save(): unable to close bucket after file write %q: %v",  blobMetadata.Filename, err)
 		return err
 	}
+
+	log.Printf("Save(): saved file %s", filePath)
 
 	return nil
 }
 
-func (r *blobRepository) Delete(uuid uuid.UUID) error {
-	//
-
-	return nil
+func (r *blobRepository) Delete(blobMetadata *entity.BlobMetadata) error {
+	filePath := blobMetadata.OwnerID.String() + "/" + blobMetadata.ID.String()
+	return r.BucketHandle.Object(filePath).Delete(r.ctx)
 }

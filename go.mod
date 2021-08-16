@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	cloud.google.com/go v0.91.1 // indirect
+	cloud.google.com/go/firestore v1.5.0
 	cloud.google.com/go/storage v1.16.0
 	firebase.google.com/go/v4 v4.6.0
 	github.com/andybalholm/brotli v1.0.3 // indirect
@@ -23,6 +24,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2 // indirect
 	github.com/swaggo/swag v1.7.1
+	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 	github.com/valyala/fasthttp v1.28.0 // indirect
 	golang.org/x/mod v0.5.0 // indirect
 	golang.org/x/net v0.0.0-20210813160813-60bc85c4be6d // indirect

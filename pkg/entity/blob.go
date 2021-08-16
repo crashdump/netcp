@@ -7,28 +7,43 @@ import (
 	"time"
 )
 
-type Blob struct {
-	ID        uuid.UUID `json:"id"         firestore:"type:uuid"`
-	Name      string    `json:"name"       firestore:"name"`
-	CreatedAt time.Time `json:"created_at" firestore:"created_at"`
-	Content   []byte    `json:"-"          firestore:"content"`
+type BlobMetadata struct {
+	ID           uuid.UUID `json:"id"            firestore:"-"` // id is stored in the doc path
+	ShortID      string    `json:"short_id"      firestore:"short_id"`
+	OwnerID      uuid.UUID `json:"owner_id"      firestore:"-"` // owner is stored in the doc path
+	Filename     string    `json:"filename"      firestore:"filename"`
+	CreatedAt    time.Time `json:"created_at"    firestore:"created_at"`
+	DownloadedAt time.Time `json:"downloaded_at" firestore:"downloaded_at"`
 }
 
-func (b Blob) String() string {
+func (b BlobMetadata) String() string {
 	ju, _ := json.Marshal(b)
 	return string(ju)
 }
 
-type Blobs []Blob
+type BlobMetadatas []BlobMetadata
 
-func (b Blobs) String() string {
+func (b BlobMetadatas) String() string {
 	ju, _ := json.Marshal(b)
 	return string(ju)
 }
 
-func (b *Blob) Validate() error {
+func (b *BlobMetadata) Validate() error {
 	if b.CreatedAt.IsZero() {
 		return errors.New("created_at cannot be null")
 	}
 	return nil
 }
+
+
+type Blob struct {
+	ID           uuid.UUID `json:"id"            firestore:"-"` // id is stored in the doc path
+	Content      []byte    `json:"-"             firestore:"-"`
+}
+
+func (b Blob) String() string {
+	ju, _ := json.Marshal(b.ID)
+	return string(ju)
+}
+
+type Blobs []Blob

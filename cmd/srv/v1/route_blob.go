@@ -41,7 +41,7 @@ func getBlob(service blob.Service) fiber.Handler {
 
 func addBlob(service blob.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var requestBody entity.Blob
+		var requestBody entity.BlobMetadata
 		err := c.BodyParser(&requestBody)
 		if err != nil {
 			_ = c.JSON(&API{

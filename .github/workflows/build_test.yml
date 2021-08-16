@@ -6,15 +6,13 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
 
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud-service-key.json
+
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions-hub/gcloud@master
-        env:
-          PROJECT_ID: cloudcopy-it
-          APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        with:
-          args: info
+      - run: echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }} | base64 --decode > ${GOOGLE_APPLICATION_CREDENTIALS}
 
       #
       # Setup Golang
@@ -41,15 +39,18 @@ jobs:
             ~/go/pkg/mod
           key: ${{ runner.os }}-omnibuild-${{ hashFiles('./go.sum') }}-${{ hashFiles('./ui/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-omnibuild--
-
+            ${{ runner.os }}-netcpbuild--
 
       #
-      # Build and test
+      # Dependencies
       - run: |
           yarn global add @vue/cli @vue/cli-service @vue/cli-service-global @vue/cli-plugin-unit-jest vue-eslint-parser jest
           yarn install
 
+      #
+      # Build
       - run: make build
 
+      #
+      # Test
       - run: make test

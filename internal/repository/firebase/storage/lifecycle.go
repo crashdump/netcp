@@ -16,11 +16,6 @@ func (r *blobRepository) SetLifecycleManagement() error {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 
-	bucket, err := r.StorageClient.Bucket(r.BucketName)
-	if err != nil {
-		return err
-	}
-
 	bucketAttrsToUpdate := storage.BucketAttrsToUpdate{
 		Lifecycle: &storage.Lifecycle{
 			Rules: []storage.LifecycleRule{
@@ -34,11 +29,11 @@ func (r *blobRepository) SetLifecycleManagement() error {
 		},
 	}
 
-	attrs, err := bucket.Update(ctx, bucketAttrsToUpdate)
+	attrs, err := r.BucketHandle.Update(ctx, bucketAttrsToUpdate)
 	if err != nil {
-		return fmt.Errorf("Bucket(%q).Update: %v", r.BucketName, err)
+		return fmt.Errorf("Bucket.Update: %v", err)
 	}
-	log.Printf("Lifecycle management is enabled for bucket %v\n and the rules are:\n", r.BucketName)
+	log.Printf("Lifecycle management is enabled and the rules are:\n")
 	for _, rule := range attrs.Lifecycle.Rules {
 		log.Printf("Action: %v\n", rule.Action)
 		log.Printf("Condition: %v\n", rule.Condition)
@@ -54,20 +49,15 @@ func (r *blobRepository) DisableLifecycleManagement() error {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 	defer cancel()
 
-	bucket, err := r.StorageClient.Bucket(r.BucketName)
-	if err != nil {
-		return err
-	}
-
 	bucketAttrsToUpdate := storage.BucketAttrsToUpdate{
 		Lifecycle: &storage.Lifecycle{},
 	}
 
-	_, err = bucket.Update(ctx, bucketAttrsToUpdate)
+	_, err := r.BucketHandle.Update(ctx, bucketAttrsToUpdate)
 	if err != nil {
-		return fmt.Errorf("Bucket(%q).Update: %v", r.BucketName, err)
+		return fmt.Errorf("Bucket.Update: %v", err)
 	}
-	log.Printf("Lifecycle management is disabled for bucket %v.\n", r.BucketName)
+	log.Printf("Lifecycle management is disabled for bucket.\n")
 
 	return nil
 }

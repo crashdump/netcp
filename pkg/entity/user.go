@@ -9,9 +9,6 @@ import (
 type User struct {
 	ID uuid.UUID `form:"id" firestore:"type:uuid"`
 
-	Auth0ID  string `json:"-" firestore:"auth0_id"`
-	APIToken string `json:"-" firestore:"api_token"`
-
 	Name  string `json:"name" firestore:"name"`
 	Email string `json:"email" firestore:"email"`
 }
@@ -29,8 +26,11 @@ func (u Users) String() string {
 }
 
 func (u *User) Validate() error {
-	if u.Auth0ID == "" {
-		return errors.New("auth0_id cannot be null")
+	if u.Name == "" {
+		return errors.New("name cannot be null")
+	}
+	if u.Email == "" {
+		return errors.New("email cannot be null")
 	}
 	return nil
 }
