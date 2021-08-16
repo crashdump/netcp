@@ -7,12 +7,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/gcloud-service-key.json
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcloud-service-key.json
 
     steps:
       - uses: actions/checkout@v2
 
-      - run: echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }} | base64 --decode > ${GOOGLE_APPLICATION_CREDENTIALS}
+      - run: |
+         touch ${GOOGLE_APPLICATION_CREDENTIALS}
+         echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }} | base64 --decode > ${GOOGLE_APPLICATION_CREDENTIALS}
 
       #
       # Setup Golang
