@@ -24,6 +24,23 @@ var (
 func main() {
 	log.Printf("%s (%s)", Name, Version)
 
+	cfg := loadConfig()
+
+	// PORT environment variable is provided by Cloud Run.
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	cfg.Set("server.port", port)
+
+	app := route.Setup(cfg)
+
+	port = cfg.GetString("server.port")
+	log.Printf("server listening on :%s", port)
+	log.Fatal(app.Listen(":" + port))
+}
+
+func loadConfig() *config.Config {
 	env := os.Getenv("GO_ENV")
 	if env == "" {
 		env = "production"
@@ -46,17 +63,5 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-
-	// PORT environment variable is provided by Cloud Run.
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
-	}
-	cfg.Set("server.port", port)
-
-	app := route.Setup(cfg)
-
-	port = cfg.GetString("server.port")
-	log.Printf("server listening on :%s", port)
-	log.Fatal(app.Listen(":" + port))
+	return cfg
 }

@@ -13,8 +13,8 @@ import (
 type Repository interface {
 	GetByID(ID uuid.UUID, owner uuid.UUID) (entity.BlobMetadata, error)
 	GetByShortID(ID string, owner uuid.UUID) (entity.BlobMetadata, error)
-	Save(blob *entity.BlobMetadata) error
-	Delete(blob *entity.BlobMetadata) error
+	Save(blob entity.BlobMetadata) error
+	Delete(blob entity.BlobMetadata) error
 }
 
 type repository struct {
@@ -108,7 +108,7 @@ func (b repository) GetByShortID(id string, owner uuid.UUID) (entity.BlobMetadat
 	return blob, nil
 }
 
-func (b repository) Save(blob *entity.BlobMetadata) error {
+func (b repository) Save(blob entity.BlobMetadata) error {
 	ownerId := blob.OwnerID.String()
 	docId := blob.ID.String()
 
@@ -128,7 +128,7 @@ func (b repository) Save(blob *entity.BlobMetadata) error {
 	return nil
 }
 
-func (b repository) Delete(blob *entity.BlobMetadata) error {
+func (b repository) Delete(blob entity.BlobMetadata) error {
 	ownerId := blob.OwnerID.String()
 	docId := blob.ID.String()
 

@@ -6,3 +6,8 @@ type API struct {
 	Message string `json:"message"`
 	Content string `json:"content"`
 }
+
+type APIBlob struct {
+	Filename string `json:"filename"`
+	Content  string `json:"content"` // base64
+}

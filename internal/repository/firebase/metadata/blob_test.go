@@ -47,7 +47,7 @@ func (suite *BlobRepositoryTestSuite) SetupTest() {
 
 func (suite *BlobRepositoryTestSuite) TestBlobRepository() {
 	for _, b := range testBlobs {
-		err := suite.blobIndexRepository.Save(&b)
+		err := suite.blobIndexRepository.Save(b)
 		suite.NoError(err)
 
 		blobByID, err := suite.blobIndexRepository.GetByID(b.ID, b.OwnerID)
@@ -62,7 +62,7 @@ func (suite *BlobRepositoryTestSuite) TestBlobRepository() {
 		suite.Equal(b.ShortID, blobByShortID.ShortID)
 		suite.Equal(b.Filename, blobByShortID.Filename)
 
-		err = suite.blobIndexRepository.Delete(&b)
+		err = suite.blobIndexRepository.Delete(b)
 		suite.NoError(err)
 
 		_, err = suite.blobIndexRepository.GetByID(b.ID, b.OwnerID)

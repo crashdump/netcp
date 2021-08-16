@@ -11,9 +11,9 @@ import (
 )
 
 type Service interface {
-	DownloadByID(ID uuid.UUID) (*entity.Blob, error)
-	DownloadByShortID(ID string) (*entity.Blob, error)
-	Upload(filename string, blob *entity.Blob) error
+	DownloadByID(ID uuid.UUID) (*entity.Blob, entity.BlobMetadata, error)
+	DownloadByShortID(ID string) (*entity.Blob, entity.BlobMetadata, error)
+	Upload(filename string, blob *entity.Blob) (string, error)
 	Remove(ID uuid.UUID) error
 }
 
@@ -30,23 +30,30 @@ func NewService(r files.Repository, m metadata.Repository) Service {
 	}
 }
 
-func (s *service) DownloadByShortID(id string) (*entity.Blob, error) {
+func (s *service) DownloadByShortID(id string) (*entity.Blob, entity.BlobMetadata, error) {
 	userid := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	meta, err := s.metadataRepository.GetByShortID(id, userid)
 	if err != nil {
-		return &entity.Blob{}, err
+		return &entity.Blob{}, entity.BlobMetadata{}, err
 	}
 
-	return s.blobRepository.GetByID(meta)
+	blob, err := s.blobRepository.GetByID(meta)
+	return blob, meta, err
 }
 
-func (s *service) DownloadByID(id uuid.UUID) (*entity.Blob, error) {
-	return s.blobRepository.GetByID(entity.BlobMetadata{
-		ID: id,
-	})
+func (s *service) DownloadByID(id uuid.UUID) (*entity.Blob, entity.BlobMetadata, error) {
+	userid := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+
+	meta, err := s.metadataRepository.GetByID(id, userid)
+	if err != nil {
+		return &entity.Blob{}, entity.BlobMetadata{}, err
+	}
+
+	blob, err := s.blobRepository.GetByID(meta)
+	return blob, meta, err
 }
 
-func (s *service) Upload(filename string, blob *entity.Blob) error {
+func (s *service) Upload(filename string, blob *entity.Blob) (string, error) {
 	userid := uuid.MustParse("00000000-0000-0000-0000-000000000000")
 	meta := entity.BlobMetadata{
 		ID:        uuid.New(),
@@ -56,12 +63,17 @@ func (s *service) Upload(filename string, blob *entity.Blob) error {
 		CreatedAt: time.Now(),
 	}
 
-	err := s.blobRepository.Save(meta, blob)
+	err := s.metadataRepository.Save(meta)
 	if err != nil {
-		return fmt.Errorf("upload(): unable to save metadata for file %s", filename)
+		return "", fmt.Errorf("upload(): unable to save metadata for file %s", filename)
 	}
-	return s.blobRepository.Save(meta, blob)
 
+	err = s.blobRepository.Save(meta, blob)
+	if err != nil {
+		return "", fmt.Errorf("upload(): unable to save blob for file %s", filename)
+	}
+
+	return meta.ShortID, nil
 }
 
 func (s *service) Remove(id uuid.UUID) error {
