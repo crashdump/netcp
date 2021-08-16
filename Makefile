@@ -26,11 +26,12 @@ build-ui:
 
 .PHONY: build-srv
 build-srv:
-	go build -o ./dist/app/netcp-srv -ldflags "-X main.Version=${VERSION}-${GIT_HASH_SHORT}" ./cmd/srv/v1/*
+	go build -o ./dist/app/netcp-srv -ldflags "-X main.Version=${VERSION}-${GIT_HASH_SHORT}" ./cmd/srv/v1/main.go
+	$(CMD_SIGN)
 
 .PHONY: build-cli
 build-cli:
-	go build -o ./dist/app/netcp -ldflags "-X main.Version=${VERSION}-${GIT_HASH_SHORT}" ./cmd/cli/v1/*
+	go build -o ./dist/app/netcp -ldflags "-X main.Version=${VERSION}-${GIT_HASH_SHORT}" ./cmd/cli/v1/main.go
 	$(CMD_SIGN)
 
 .PHONY: build-swagger
