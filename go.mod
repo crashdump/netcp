@@ -3,9 +3,8 @@ module github.com/crashdump/netcp
 go 1.16
 
 require (
-	cloud.google.com/go v0.91.1 // indirect
 	cloud.google.com/go/firestore v1.5.0
-	cloud.google.com/go/storage v1.16.0
+	cloud.google.com/go/storage v1.16.1
 	firebase.google.com/go/v4 v4.6.0
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/arsmn/fiber-swagger/v2 v2.17.0
@@ -30,8 +29,5 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210810183815-faf39c7919d5 // indirect
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/api v0.54.0 // indirect
-	google.golang.org/genproto v0.0.0-20210813162853-db860fec028c // indirect
-	google.golang.org/grpc v1.40.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
