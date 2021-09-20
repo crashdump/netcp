@@ -3,7 +3,7 @@ module github.com/crashdump/netcp
 go 1.16
 
 require (
-	cloud.google.com/go/firestore v1.5.0
+	cloud.google.com/go/firestore v1.6.0
 	cloud.google.com/go/storage v1.16.1
 	firebase.google.com/go/v4 v4.6.0
 	github.com/andybalholm/brotli v1.0.3 // indirect
