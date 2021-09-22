@@ -2,7 +2,10 @@ VERSION:=$(shell head -n1 VERSION)
 GIT_HASH_SHORT:=$(shell git rev-parse --short HEAD)
 UNAME := $(shell uname -s)
 GOOGLE_APPLICATION_CREDENTIALS ?= "~/.gcp/netcp-it-service-account.json"
-GOOGLE_CLOUD_PROJECT ?= cloudcopy-it
+GOOGLE_CLOUD_PROJECT ?= "cloudcopy-it"
+FIRESTORE_EMULATOR_HOST := "localhost:8080"
+FIREBASE_AUTH_EMULATOR_HOST := "localhost:9099"
+FIREBASE_STORAGE_EMULATOR_HOST := "localhost:9199"
 
 ifeq ($(UNAME), Darwin)
 	# TODO: Ensure the below automatically select the right identity so it's not tied to my machine.

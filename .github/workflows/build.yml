@@ -1,4 +1,4 @@
-name: build_test
+name: build
 
 on: push
 
@@ -6,15 +6,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcloud-service-key.json
-
     steps:
       - uses: actions/checkout@v2
-
-      - run: |
-         touch ${GOOGLE_APPLICATION_CREDENTIALS}
-         echo ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }} | base64 --decode > ${GOOGLE_APPLICATION_CREDENTIALS}
 
       #
       # Setup Golang
@@ -44,7 +37,7 @@ jobs:
             ${{ runner.os }}-netcpbuild--
 
       #
-      # Dependencies
+      # Build dependencies
       - run: |
           yarn global add @vue/cli @vue/cli-service @vue/cli-service-global @vue/cli-plugin-unit-jest vue-eslint-parser jest
           yarn install
@@ -52,6 +45,14 @@ jobs:
       #
       # Build
       - run: make build
+
+      #
+      # Test dependencies
+      - run: |
+          curl -o /usr/local/bin/firebase -L https://firebase.tools/bin/linux/latest
+          chmod +rx /usr/local/bin/firebase
+          /usr/local/bin/firebase emulators:start --only "auth,database,firestore" &
+          sleep 10 # sorry, that's not very pretty.
 
       #
       # Test
