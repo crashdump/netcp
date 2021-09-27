@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.6.2",
-    "@vue/compiler-sfc": "^3.2.16",
+    "@vue/compiler-sfc": "^3.2.19",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.24.2",
