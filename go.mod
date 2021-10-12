@@ -6,6 +6,7 @@ require (
 	cloud.google.com/go/firestore v1.6.0
 	cloud.google.com/go/storage v1.16.1
 	firebase.google.com/go/v4 v4.6.0
+	github.com/alexflint/go-arg v1.4.2 // indirect
 	github.com/andybalholm/brotli v1.0.3 // indirect
 	github.com/arsmn/fiber-swagger/v2 v2.17.0
 	github.com/auth0-community/go-auth0 v1.0.0

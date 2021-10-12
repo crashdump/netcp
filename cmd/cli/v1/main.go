@@ -4,13 +4,14 @@ import (
 	"encoding/base64"
 	"flag"
 	"fmt"
-	"github.com/crashdump/netcp/pkg/entity"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
 
+	"github.com/alexflint/go-arg"
 	"github.com/crashdump/netcp/internal/config"
+	"github.com/crashdump/netcp/pkg/entity"
 	"github.com/crashdump/netcp/pkg/netcp"
 )
 
@@ -32,14 +33,33 @@ func init() {
 	flag.StringVar(&flagPort, "server.port", "3000", "Port")
 }
 
+var args struct {
+	Upload   *UploadCmd   `arg:"subcommand:upload"`
+	Download *DownloadCmd `arg:"subcommand:download"`
+	List     *ListCmd     `arg:"subcommand:list"`
+	Quiet    bool         `arg:"-q"` // this flag is global to all subcommands
+}
+
+type UploadCmd struct {
+	File string `arg:"positional"`
+}
+
+type ListCmd struct {
+}
+
+type DownloadCmd struct {
+	Code string `arg:"positional"`
+	Path string `arg:"positional"`
+}
+
 func main() {
 	log.Printf("%s (%s)", Name, Version)
 
 	cfg, err := loadConfig()
 
-	if len(os.Args) < 2 {
-		fmt.Println("expected 'upload', 'list', or 'download' subcommands")
-		os.Exit(1)
+	p := arg.MustParse(&args)
+	if p.Subcommand() == nil {
+		p.Fail("missing subcommand, expected 'upload', 'list', or 'download'.")
 	}
 
 	url := fmt.Sprintf("http://%s:%s", cfg.GetString("server.host"), cfg.GetString("server.port"))
@@ -48,18 +68,14 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	switch os.Args[1] {
-	case "upload":
-		if os.Args[2] == "" {
-			log.Fatal("usage: ./netcp upload FILENAME")
-		}
-		pathIn := os.Args[2]
-		fileData, err := ioutil.ReadFile(pathIn)
+	switch {
+	case args.Upload != nil:
+		fileData, err := ioutil.ReadFile(args.Upload.File)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		_, fileName := path.Split(pathIn)
+		_, fileName := path.Split(args.Upload.File)
 
 		err = o.Upload(&entity.APIBlob{
 			Filename: fileName,
@@ -71,15 +87,8 @@ func main() {
 
 		os.Exit(0)
 
-	case "download":
-		if os.Args[2] == "" || os.Args[3] == "" {
-			log.Fatal("usage: ./netcp download CODE FILENAME")
-		}
-
-		codeIn := os.Args[2]
-		pathOut := os.Args[3]
-
-		blob, err := o.DownloadByShortID(codeIn)
+	case args.Download != nil:
+		blob, err := o.DownloadByShortID(args.Download.Code)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -89,18 +98,22 @@ func main() {
 			log.Fatal(err.Error())
 		}
 
-		err = ioutil.WriteFile(pathOut, blobBytes, 0644)
+		var filePathOut string
+		isd, err := isDirectory(args.Download.Path)
+		if isd {
+			filePathOut = args.Download.Path + "/" + blob.Filename
+		} else {
+			filePathOut = args.Download.Path
+		}
+
+		err = ioutil.WriteFile(filePathOut, blobBytes, 0644)
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-
 		os.Exit(0)
 
-	case "list":
+	case args.List != nil:
 		log.Fatal("not implemented yet.")
-
-	default:
-		log.Fatal("expected 'upload', 'list' or 'download' subcommands")
 	}
 }
 
@@ -127,4 +140,13 @@ func loadConfig() (*config.Config, error) {
 		os.Exit(1)
 	}
 	return cfg, err
+}
+
+func isDirectory(path string) (bool, error) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false, err
+	}
+
+	return fileInfo.IsDir(), err
 }
