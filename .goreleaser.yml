@@ -8,11 +8,17 @@ before:
   hooks:
     - go mod download
 builds:
-  - binary: netcp
+  - id: netcp
+    binary: netcp
+    main: ./cmd/cli/v1
     env:
       - CGO_ENABLED=0
       - GO111MODULE=on
-    ldflags: -s -w -X main.GitCommit={{ .ShortCommit }}  -X main.BuildDate={{ .Timestamp }}
+    ldflags:
+      - -s
+      - -w
+      - -X main.GitCommit={{ .ShortCommit }}
+      - -X main.BuildDate={{ .Timestamp }}
     goos:
       - linux
       - darwin
@@ -22,10 +28,57 @@ builds:
       - amd64
       - arm
       - arm64
-    goarm:
-      - 7
+    tags:
+      - client
+  - id: netcp-srv
+    binary: netcp-srv
+    main: ./cmd/srv/v1
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+    ldflags:
+      - -s
+      - -w
+      - -X main.GitCommit={{ .ShortCommit }}
+      - -X main.BuildDate={{ .Timestamp }}
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm
+      - arm64
+    tags:
+      - server
+dockers:
+  - id: netcp-srv
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - "crashdump/netcp:latest"
+      - "crashdump/netcp:{{ .Tag }}"
+      - "crashdump/netcp:v{{ .Major }}"
+    dockerfile: build/Dockerfile
+nfpms:
+  - id: netcp
+    package_name: netcp
+    builds:
+      - netcp
+    homepage: https://github.com/crashdump/netcp
+    maintainer: Adrien Pujol <ap@cdfr.net>
+    description:  Copy files and directories across systems without requiring a direct network line-of-sight. Netcp uses a cloud storage endpoint to store the data while in flight.
+    license: Apache 2.0
+    formats:
+      - apk
+      - deb
+      - rpm
+    priority: extra
 archives:
-  - name_template: '{{.ProjectName}}-{{.Tag}}-{{.Os}}-{{.Arch}}{{if .Arm}}{{.Arm}}{{end}}'
+  - builds:
+      - netcp
+    name_template: '{{.ProjectName}}-{{.Tag}}-{{.Os}}-{{.Arch}}{{if .Arm}}{{.Arm}}{{end}}'
     replacements:
       darwin: darwin
       linux: linux
