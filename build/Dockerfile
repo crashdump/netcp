@@ -1,22 +1,3 @@
-# Use base golang image from Docker Hub
-FROM golang:1.17.2 AS build
-
-WORKDIR /netcp
-
-# Install dependencies in go.mod and go.sum
-COPY go.mod go.sum ./
-RUN go mod download
-
-# Copy rest of the application source code
-COPY . ./
-
-# Compile the application to /app.
-# Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN echo "Go gcflags: ${SKAFFOLD_GO_GCFLAGS}"
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -mod=readonly -v -o /app ./cmd/srv/v1/
-
-# Now create separate deployment image
 FROM gcr.io/distroless/base
 
 # Definition of this variable is used by 'skaffold debug' to identify a golang binary.
@@ -26,7 +7,5 @@ ENV GOTRACEBACK=single
 
 # Copy template & assets
 WORKDIR /netcp
-COPY --from=build /app ./app
-COPY ui ui/
-COPY api/swagger swagger/
-ENTRYPOINT ["./app"]
+COPY netcp-srv ./srv
+ENTRYPOINT ["./srv"]

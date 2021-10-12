@@ -6,17 +6,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcloud-service-key.json
+
     steps:
       - uses: actions/checkout@v2
 
-      #
-      # Setup Golang
+      - run: |
+          touch ${GOOGLE_APPLICATION_CREDENTIALS}
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_CONTENT }}" | base64 --decode > ${GOOGLE_APPLICATION_CREDENTIALS}
+
+      # Setup Go & NodeJS
       - uses: actions/setup-go@v2
         with:
-          go-version: '^1.16.3'
+          go-version: '^1.17.2'
 
-      #
-      # Setup Node
       - uses: actions/setup-node@v2
         with:
           node-version: '15'
