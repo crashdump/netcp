@@ -10,7 +10,7 @@
     "vue": "^3.2.9"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.6.2",
+    "@vitejs/plugin-vue": "^1.7.1",
     "@vue/compiler-sfc": "^3.2.16",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
