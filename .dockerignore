@@ -2,3 +2,6 @@
 .vscode
 .idea
 .readmes
+.github
+docs
+deployment

@@ -28,5 +28,4 @@ ENV GOTRACEBACK=single
 WORKDIR /netcp
 COPY --from=build /app ./app
 COPY ui ui/
-COPY api/swagger swagger/
 ENTRYPOINT ["./app"]
