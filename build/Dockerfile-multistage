@@ -10,11 +10,8 @@ RUN go mod download
 # Copy rest of the application source code
 COPY . ./
 
-# Compile the application to /app.
-# Skaffold passes in debug-oriented compiler flags
-ARG SKAFFOLD_GO_GCFLAGS
-RUN echo "Go gcflags: ${SKAFFOLD_GO_GCFLAGS}"
-RUN go build -gcflags="${SKAFFOLD_GO_GCFLAGS}" -mod=readonly -v -o /app ./cmd/srv/v1/
+# Compile the application to ./dist/app/netcp-srv.
+RUN make build-srv
 
 # Now create separate deployment image
 FROM gcr.io/distroless/base
@@ -26,6 +23,6 @@ ENV GOTRACEBACK=single
 
 # Copy template & assets
 WORKDIR /netcp
-COPY --from=build /app ./app
+COPY --from=build /netcp/dist/app/netcp-srv ./app
 COPY ui ui/
 ENTRYPOINT ["./app"]
