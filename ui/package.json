@@ -10,7 +10,7 @@
     "vue": "^3.2.20"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.7.1",
+    "@vitejs/plugin-vue": "^1.9.3",
     "@vue/compiler-sfc": "^3.2.20",
     "ansi-regex": ">=5.0.1",
     "eslint": "^7.32.0",
