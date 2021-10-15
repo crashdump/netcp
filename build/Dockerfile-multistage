@@ -23,6 +23,7 @@ ENV GOTRACEBACK=single
 
 # Copy template & assets
 WORKDIR /netcp
-COPY --from=build /netcp/dist/app/netcp-srv ./app
-COPY ui ui/
+COPY --from=build /netcp/dist/app/netcp-srv /netcp/app
+COPY --from=build /netcp/ui/dist/ /netcp/ui/dist/
+
 ENTRYPOINT ["./app"]

@@ -3,14 +3,12 @@ package route
 import (
 	"context"
 	firebase "firebase.google.com/go/v4"
-	"fmt"
 	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/crashdump/netcp/internal/config"
 	"github.com/crashdump/netcp/internal/handler"
 	fileStore "github.com/crashdump/netcp/internal/repository/firebase/files"
 	metadataStore "github.com/crashdump/netcp/internal/repository/firebase/metadata"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"
 	"time"
 )
@@ -36,16 +34,6 @@ func Setup(cfg *config.Config) *fiber.App {
 	bs := handler.NewService(br, mr)
 
 	f := fiber.New()
-
-	// CORS
-	url := fmt.Sprintf("http://%s:%s",
-		cfg.GetString("server.host"),
-		cfg.GetString("server.port"),
-	)
-	f.Use(cors.New(cors.Config{
-		AllowOrigins: url,
-		AllowMethods: "GET,POST,DELETE",
-	}))
 
 	// Routes
 	api := f.Group("/api/v1")
