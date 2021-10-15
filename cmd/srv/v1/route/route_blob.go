@@ -9,12 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-func BlobRouter(f fiber.Router, service handler.Service) {
-	f.Post("/blob", addBlob(service))
-	f.Get("/blob/:id", getBlobByShortID(service))
-	f.Delete("/blob/:id", removeBlob(service))
-}
-
 func getBlobByShortID(service handler.Service) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		blob, meta, err := service.DownloadByShortID(c.Params("id"))

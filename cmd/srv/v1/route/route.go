@@ -2,16 +2,17 @@ package route
 
 import (
 	"context"
-	"fmt"
-	"log"
-
 	firebase "firebase.google.com/go/v4"
+	"fmt"
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/crashdump/netcp/internal/config"
 	"github.com/crashdump/netcp/internal/handler"
 	fileStore "github.com/crashdump/netcp/internal/repository/firebase/files"
 	metadataStore "github.com/crashdump/netcp/internal/repository/firebase/metadata"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"log"
+	"time"
 )
 
 func Setup(cfg *config.Config) *fiber.App {
@@ -47,15 +48,25 @@ func Setup(cfg *config.Config) *fiber.App {
 	}))
 
 	// Routes
-	UIRouter(f)
-	SwaggerRouter(f)
-
 	api := f.Group("/api/v1")
-	StatusRouter(api)
+	api.Get("/status", status(bs))
 
 	//api.Use(middlewares.AuthMiddleware())
 
-	BlobRouter(api, bs)
+	api.Post("/blob", addBlob(bs))
+	api.Get("/blob/:id", getBlobByShortID(bs))
+	api.Delete("/blob/:id", removeBlob(bs))
+
+	f.Get("/docs/*", swagger.Handler)
+
+	f.Static("/", "./ui/dist",
+		fiber.Static{
+			Compress:      true,
+			Browse:        false,
+			Index:         "index.html",
+			CacheDuration: 30 * time.Second,
+			MaxAge:        3600,
+		})
 
 	return f
 }
