@@ -4,8 +4,8 @@ module.exports = {
     es2021: true
   },
   extends: [
-    'plugin:vue/essential',
-    'standard'
+    'eslint:recommended',
+    'plugin:vue/vue3-recommended',
   ],
   ignorePatterns: [
     '**/dist/**/*.js'

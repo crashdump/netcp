@@ -1,6 +1,7 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png" />
   <Landing msg="netcp" />
+  <HelloWorld />
 </template>
 
 <script setup>

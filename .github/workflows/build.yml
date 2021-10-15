@@ -51,13 +51,11 @@ jobs:
       - run: make build
 
       #
-      # Test dependencies
+      # Test
       - run: |
           curl -o /usr/local/bin/firebase -L https://firebase.tools/bin/linux/latest
           chmod +rx /usr/local/bin/firebase
           /usr/local/bin/firebase emulators:start --only "auth,database,firestore" &
           sleep 10 # sorry, that's not very pretty.
 
-      #
-      # Test
       - run: make test

@@ -28,6 +28,7 @@ build:
 	$(MAKE) build-srv
 	$(MAKE) build-cli
 	$(CMD_SIGN)
+	$(MAKE) build-ui
 
 .PHONY: build-srv
 build-srv:
