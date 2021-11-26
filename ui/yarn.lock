@@ -61,9 +61,10 @@
   version "0.0.29"
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
 
-"@vitejs/plugin-vue@^1.7.1":
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-1.7.1.tgz#8b0fc87628425a8ab39798a023c652fcfc0619c9"
+"@vitejs/plugin-vue@^1.10.1":
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-1.10.1.tgz#d140e93d574c5eac247a79f5b15df665dcb7635b"
+  integrity sha512-oL76QETMSpVE9jIScirGB2bYJEVU/+r+g+K7oG+sXPs9TZljqveoVRsmLyXlMZTjpQkLL8gz527cW80NMGVKJg==
 
 "@vue/compiler-core@3.2.20":
   version "3.2.20"
