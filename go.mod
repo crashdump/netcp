@@ -7,15 +7,15 @@ require (
 	cloud.google.com/go/storage v1.16.1
 	firebase.google.com/go/v4 v4.6.0
 	github.com/alexflint/go-arg v1.4.2
-	github.com/arsmn/fiber-swagger/v2 v2.17.0
+	github.com/arsmn/fiber-swagger/v2 v2.20.0
 	github.com/auth0-community/go-auth0 v1.0.0
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-resty/resty/v2 v2.6.0
-	github.com/gofiber/fiber/v2 v2.19.0
+	github.com/gofiber/fiber/v2 v2.20.2
 	github.com/google/uuid v1.3.0
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
-	github.com/swaggo/swag v1.7.1
+	github.com/swaggo/swag v1.7.3
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
