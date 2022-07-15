@@ -10,7 +10,7 @@ require (
 	github.com/arsmn/fiber-swagger/v2 v2.31.1
 	github.com/auth0-community/go-auth0 v1.0.0
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-resty/resty/v2 v2.6.0
+	github.com/go-resty/resty/v2 v2.7.0
 	github.com/gofiber/fiber/v2 v2.35.0
 	github.com/google/uuid v1.3.0
 	github.com/spf13/viper v1.9.0
