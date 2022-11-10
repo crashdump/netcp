@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.10.2",
-    "@vue/compiler-sfc": "^3.2.20",
+    "@vue/compiler-sfc": "^3.2.44",
     "ansi-regex": ">=5.0.1",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
