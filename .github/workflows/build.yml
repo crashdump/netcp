@@ -10,7 +10,7 @@ jobs:
       GOOGLE_APPLICATION_CREDENTIALS: /tmp/gcloud-service-key.json
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - run: |
           touch ${GOOGLE_APPLICATION_CREDENTIALS}
