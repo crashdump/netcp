@@ -15,7 +15,7 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.8.3
-	github.com/swaggo/swag v1.8.1
+	github.com/swaggo/swag v1.16.3
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 	gopkg.in/square/go-jose.v2 v2.6.0
 )
@@ -88,7 +88,7 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
-	golang.org/x/tools v0.6.0 // indirect
+	golang.org/x/tools v0.7.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.150.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
