@@ -28,7 +28,7 @@ jobs:
 
       #
       # Cache
-      - uses: actions/cache@v3.3.2
+      - uses: actions/cache@v4.0.1
         id: yarn-cache
         with:
           path: |
