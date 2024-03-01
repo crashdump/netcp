@@ -14,7 +14,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.50.0
 	github.com/google/uuid v1.4.0
 	github.com/spf13/viper v1.9.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.9.0
 	github.com/swaggo/swag v1.8.1
 	github.com/teris-io/shortid v0.0.0-20201117134242-e59966efd125
 	gopkg.in/square/go-jose.v2 v2.6.0
