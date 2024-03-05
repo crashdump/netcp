@@ -1,6 +1,6 @@
 # ---
 # Use base golang image from Docker Hub
-FROM golang:1.21.5 AS build-srv
+FROM golang:1.22.1 AS build-srv
 
 WORKDIR /netcp
 
